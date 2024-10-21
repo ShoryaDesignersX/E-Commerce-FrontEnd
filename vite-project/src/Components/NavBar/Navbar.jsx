@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
-import { FaUser } from "react-icons/fa";
+import { FaUser, FaCartPlus, FaHeart } from "react-icons/fa";
 import Swal from "sweetalert2";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -13,7 +14,7 @@ const Navbar = () => {
       text: "You will be logged out.",
       icon: "warning",
       showCancelButton: true,
-      confirmButtonColor: "#3085d6",
+      confirmButtonColor: "#4F46E5",
       cancelButtonColor: "#d33",
       confirmButtonText: "Yes, log out!",
     }).then((result) => {
@@ -34,34 +35,29 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="bg-purple-700  w-full z-20 top-0 shadow-lg">
-      <div className="max-w-screen-xl flex items-center justify-between mx-auto p-4">
+    <nav className="bg-purple-800 w-full shadow-lg">
+      <div className="max-w-screen-xl mx-auto flex items-center justify-between p-4">
         {/* Logo Section */}
-        <a href="/" className="flex items-center space-x-3">
-          <img
-            src="https://flowbite.com/docs/images/logo.svg"
-            className="h-12 w-12 rounded-full shadow-lg"
-            alt="Logo"
-          />
-          <span className="text-3xl font-extrabold text-white">MyShop</span>
-        </a>
+        <Link to="/" className="flex items-center space-x-3">
+          
+          <span className="text-3xl font-extrabold text-white">E-Commerce</span>
+        </Link>
 
         {/* Navigation Links */}
         <div
           className={`${
             isMenuOpen ? "block" : "hidden"
           } md:flex md:items-center md:space-x-10`}
-          id="navbar-menu"
         >
-          <ul className="flex flex-col md:flex-row md:space-x-10 mt-4 md:mt-0">
-            {["Home", "About", "Products", "Add Products"].map((text, idx) => (
+          <ul className="flex flex-col md:flex-row md:space-x-5 mt-4 md:mt-0">
+            {["Home", "About", "Products", "Contact"].map((text, idx) => (
               <li key={idx}>
                 <NavLink
-                  to={`/${text.toLowerCase().replace(" ", "")}`}
+                  to={`/${text.toLowerCase()}`}
                   className={({ isActive }) =>
                     `block py-2 px-4 rounded-lg ${
                       isActive ? "text-black font-bold" : "text-white"
-                    } hover:text-yellow-300 hover:bg-white hover:bg-opacity-20 transition-colors duration-300`
+                    } hover:text-black hover:bg-white hover:bg-opacity-20 transition-colors duration-300`
                   }
                 >
                   {text}
@@ -72,27 +68,66 @@ const Navbar = () => {
         </div>
 
         {/* User Actions */}
-        <div className="flex space-x-4 items-center">
-          {/* User Icon / Image */}
-          <div
-            className="w-10 h-10 rounded-full overflow-hidden border-2 border-white cursor-pointer"
-            onClick={() => navigate("/user")}
-          >
-            <img
-              src="https://via.placeholder.com/150"
-              alt="User"
-              className="object-cover w-full h-full"
-            />
+        <div className="flex items-center space-x-4">
+          {/* Cart Icon */}
+          <Link to="/cart" className="text-white hover:text-black">
+            <FaCartPlus className="w-6 h-6" />
+          </Link>
+          {/* Wishlist Icon */}
+          <Link to="/wishlist" className="text-white hover:text-black">
+            <FaHeart className="w-6 h-6" />
+          </Link>
+          {/* User Profile */}
+          <div className="relative">
+            <button
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              className="flex items-center space-x-2 text-white"
+            >
+              <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-white cursor-pointer">
+                <img
+                  src="https://via.placeholder.com/150"
+                  alt="User"
+                  className="object-cover w-full h-full"
+                />
+              </div>
+              <span className="hidden md:inline">Profile</span>
+            </button>
+            {isDropdownOpen && (
+              <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-20">
+                <ul className="py-2">
+                  <li>
+                    <Link
+                      to="/user"
+                      className="block px-4 py-2 text-gray-800 hover:bg-gray-100"
+                      onClick={() => setIsDropdownOpen(false)}
+                    >
+                      User Profile
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      to="/addproducts"
+                      className="block px-4 py-2 text-gray-800 hover:bg-gray-100"
+                      onClick={() => setIsDropdownOpen(false)}
+                    >
+                      Add Product
+                    </Link>
+                  </li>
+                  <li>
+                    <button
+                      className="block w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-100"
+                      onClick={() => {
+                        handleLogout();
+                        setIsDropdownOpen(false);
+                      }}
+                    >
+                      Log Out
+                    </button>
+                  </li>
+                </ul>
+              </div>
+            )}
           </div>
-
-          {/* Log-Out Button */}
-          <button
-            type="button"
-            onClick={handleLogout}
-            className="hidden md:inline-block text-white bg-red-500 hover:bg-red-600 shadow-lg rounded-lg text-sm px-5 py-2.5 transition-all duration-300"
-          >
-            Log Out
-          </button>
 
           {/* Hamburger Menu for Mobile */}
           <button

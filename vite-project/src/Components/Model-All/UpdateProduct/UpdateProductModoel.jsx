@@ -3,7 +3,6 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { motion } from "framer-motion";
 
-
 const UpdateProductModel = ({ onClose, onSave, product }) => {
   //   console.log(product.userId);
   const initialValues = {
@@ -12,12 +11,17 @@ const UpdateProductModel = ({ onClose, onSave, product }) => {
     desc: product.desc || "",
     size: product.size || [],
     stock: product.stock || "",
-    productimage: product.productimage || "",
+    productimage: product.imgPath || "",
     userId: product.userId || "",
   };
+  // console.log(product.imgPath);
 
-  const [images, setImages] = useState([]);
-  console.log("upper", images);
+  const [images, setImages] = useState(product.imgPath || []);
+  console.log("images", images);
+  const [selectedFiles, setSelectedFiles] = useState(product.imgPath || []);
+  console.log("selected files", selectedFiles);
+
+  // console.log("upper", images);
 
   const validationSchema = Yup.object({
     title: Yup.string()
@@ -58,14 +62,16 @@ const UpdateProductModel = ({ onClose, onSave, product }) => {
   };
 
   return (
+    <>
     <motion.div
-      className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center z-50"
+      className="fixed overflow-x inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center z-50"
+      id="scrollbarId"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.2 }}
     >
-      <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg">
+      <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg overflow-scroll " style={{"height":"80vh"}}>
         <h2 className="text-2xl font-semibold mb-4">Update Product</h2>
         <Formik
           initialValues={initialValues}
@@ -214,48 +220,77 @@ const UpdateProductModel = ({ onClose, onSave, product }) => {
                 <label className="block mb-2 text-gray-700 font-medium">
                   Product Image
                 </label>
-                <input
-                  multiple
-                  type="file"
-                  accept="image/*"
-                  onChange={(event) => {
-                    const filesArray = Array.from(
-                      event.currentTarget.files
-                    ).map((file) => URL.createObjectURL(file));
-                    setImages((prevImages) => [...prevImages, ...filesArray]); // Append new images
-                    setFieldValue("productimage", event.currentTarget.files);
-                    console.log("sdd", event.currentTarget.files);
-                  }}
-                  name="productimage"
-                  className="block w-full p-3 text-gray-700 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-                <div className="flex gap-3 mt-3">
-                  {images.map((value, index) => (
-                    <div key={index} className="relative">
-                      <img
-                        src={value}
-                        alt={`Image ${index + 1}`}
-                        className="w-20 h-20 object-cover"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setImages((prevImages) =>
-                            prevImages.filter((_, i) => i !== index)
-                          ); // Remove image at index
-                        }}
-                        className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1"
-                      >
-                        &times;
-                      </button>
-                    </div>
-                  ))}
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 bg-gray-50">
+                  <div className="flex flex-wrap gap-4">
+                    {images.map((value, index) => (
+                      <div key={index} className="relative w-20 h-20">
+                        <img
+                          src={value}
+                          alt={`Image ${index + 1}`}
+                          className="w-full h-full object-cover rounded-lg shadow-md"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setImages((prevImages) =>
+                              prevImages.filter((_, i) => i !== index)
+                            );
+                            const updatedFiles = selectedFiles.filter(
+                              (_, i) => i !== index
+                            );
+                            console.log(updatedFiles);
+                            setSelectedFiles(updatedFiles);
+                            setFieldValue("productimage", updatedFiles);
+                          }}
+                          className="absolute -top-2 -right-2 bg-red-600 text-white rounded-full p-1 shadow-lg hover:bg-red-700 transition"
+                        >
+                          &times;
+                        </button>
+                      </div>
+                    ))}
+                    <label
+                      htmlFor="add-more-photos"
+                      name="productimage"
+                      className="flex items-center justify-center w-20 h-20 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-100 hover:bg-gray-200 transition"
+                    >
+                      <span className="text-gray-500">+</span>
+                    </label>
+                    <input
+                      id="add-more-photos"
+                      type="file"
+                      multiple
+                      accept="image/*"
+                      onChange={(event) => {
+                        const filesArray = Array.from(
+                          event.currentTarget.files
+                        );
+                        const imageUrls = filesArray.map((file) =>
+                          URL.createObjectURL(file)
+                        );
+                        setImages((prevImages) => [
+                          ...prevImages,
+                          ...imageUrls,
+                        ]);
+                        setSelectedFiles((prevFiles) => [
+                          ...prevFiles,
+                          ...filesArray,
+                        ]);
+                        setFieldValue("productimage", [
+                          ...selectedFiles,
+                          ...filesArray,
+                        ]);
+                      }}
+                      className="hidden"
+                    />
+                  </div>
+                  <p className="mt-2 text-sm text-gray-500">
+                    Add up to 5 images. (SVG, PNG, JPG, GIF)
+                  </p>
                 </div>
-
                 <ErrorMessage
                   name="productimage"
                   component="div"
-                  className="text-red-500 absolute text-xs"
+                  className="text-red-500 mt-1 text-xs"
                 />
               </div>
 
@@ -279,6 +314,7 @@ const UpdateProductModel = ({ onClose, onSave, product }) => {
         </Formik>
       </div>
     </motion.div>
+    </>
   );
 };
 

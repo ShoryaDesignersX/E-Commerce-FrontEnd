@@ -11,6 +11,7 @@ import ProtectedRoute from "./Routes/ProtectedRoutes";
 import AddProducts from "./Pages/Products/AddProducts/AddProducts";
 import Products from "./Pages/Products/Products";
 import ProductPage from "./Pages/Products/ProductPage/ProductPage";
+import Home from "./Pages/Home/Home";
 
 function App() {
   const [count, setCount] = useState(0);
@@ -31,6 +32,7 @@ function App() {
             <Route path="/user" element={<UserProfile />} />
             <Route path="/addproducts" element={<AddProducts />} />
             <Route path="/products" element={<Products />} />
+            <Route path="/home" element={<Home />} />
             <Route path="/item" element={<ProductPage />} />
             <Route path="*" element={<UserProfile />} />
             {/* Fallback route */}
